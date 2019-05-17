@@ -1,11 +1,10 @@
-﻿Imports DevExpress.DataAccess.ConnectionParameters
+﻿Imports System.ComponentModel
+Imports DevExpress.DataAccess.ConnectionParameters
 Imports DevExpress.DataAccess.DataFederation
 Imports DevExpress.DataAccess.Excel
+Imports DevExpress.DataAccess.Json
 Imports DevExpress.DataAccess.Sql
 Imports DevExpress.DataAccess.Sql.DataApi
-Imports System
-Imports System.Collections.Generic
-Imports System.ComponentModel
 
 Namespace FederationDataSourceExample
 	Friend Class FederationDataSourceHelper
@@ -26,7 +25,7 @@ Namespace FederationDataSourceExample
             query.Expressions.Add(New SelectColumnExpression(sourceNode, "Extended Price"))
             query.FilterString = "[Orders.CategoryName] = ?cat"
             federation.Queries.Add(query)
-			federation.Fill( { New QueryParameter("cat", GetType(String), "Seafood") })
+            federation.Fill( { New DevExpress.DataAccess.Sql.QueryParameter("cat", GetType(String), "Seafood") })
 			Dim result = TryCast(DirectCast(federation, IListSource).GetList(), IResultSet)
 			DataSource = result(0)
 		End Sub
@@ -34,10 +33,7 @@ Namespace FederationDataSourceExample
 		Public Shared Sub Join_Sql_And_Excel_Sources()
 			Dim federation As New FederationDataSource()
 
-			Dim sqlDataSource = New SqlDataSource(New XmlFileConnectionParameters("Products.xml"))
-			sqlDataSource.Queries.Add(SelectQueryFluentBuilder.AddTable("Products").SelectColumns("ProductName", "QuantityPerUnit").Build("Products"))
-
-			Dim sourceProducts As New Source("Products", sqlDataSource, "Products")
+			Dim sourceProducts As New Source("Products", CreateSqlDataSource(), "Products")
 			Dim sourceOrderDetail As New Source("OrderDetail", CreateExcelDataSource("SalesPerson.xlsx", "Data"))
 
 			Dim sourceNodeProducts = New SourceNode(sourceProducts, "Products")
@@ -59,30 +55,19 @@ Namespace FederationDataSourceExample
 			DataSource = result(0)
 		End Sub
 
-		Public Shared Sub Two_Queries_Created_With_Fluent_API()
+		Public Shared Sub Two_Queries_Created_With_Fluent_Interface()
 			Dim federation As New FederationDataSource()
 
-			Dim sqlDataSource = New SqlDataSource(New XmlFileConnectionParameters("Products.xml"))
-			sqlDataSource.Queries.Add(SelectQueryFluentBuilder.AddTable("Products").SelectColumns("ProductName", "QuantityPerUnit", "UnitsInStock").Build("Products"))
-
-			Dim sourceProducts As New Source("Products", sqlDataSource, "Products")
+			Dim sourceProducts As New Source("Products", CreateSqlDataSource(), "Products")
 			Dim sourceOrderDetail As New Source("OrderDetail", CreateExcelDataSource("SalesPerson.xlsx", "Data"))
 			Dim sourceHeader As New Source("OrderHeader", CreateExcelDataSource("OrderHeaders.xlsx", "OrderHeader"))
 
 
-            Dim query1 As SelectNode = sourceProducts.From().
-                Select("ProductName", "QuantityPerUnit", "UnitsInStock").
-                Join(sourceOrderDetail, "[Products.ProductName] = [OrderDetail.ProductName]").
-                Select("OrderDate").
-                Build("ProductsOrderDetail")
+			Dim query1 As SelectNode = sourceProducts.From().Select("ProductName", "QuantityPerUnit", "UnitsInStock").Join(sourceOrderDetail, "[Products.ProductName] = [OrderDetail.ProductName]").Select("OrderDate").Build("ProductsOrderDetail")
 
-            Dim query2 As SelectNode = sourceHeader.From().
-                Select("OrderID", "Status", "Description").
-                Join(sourceOrderDetail, "[OrderHeader.OrderID] = [OrderDetail.OrderID]").
-                Select("Quantity", "Extended Price").
-                Build("OrderHeaderOrderDetail")
+			Dim query2 As SelectNode = sourceHeader.From().Select("OrderID", "Status", "Description").Join(sourceOrderDetail, "[OrderHeader.OrderID] = [OrderDetail.OrderID]").Select("Quantity", "Extended Price").Build("OrderHeaderOrderDetail")
 
-            federation.Queries.AddRange( { query1, query2 })
+			federation.Queries.AddRange( { query1, query2 })
 			federation.Fill()
 			DataSource = federation
 		End Sub
@@ -125,22 +110,53 @@ Namespace FederationDataSourceExample
                                                                     .NestedKeyColumn = "OrderID",
                                                                     .ConditionOperator = FederationConditionType.Equal}))
             federation.Fill()
-			DataSource = federation
+            DataSource = federation
 		End Sub
 
+		Public Shared Sub Integrate_SQL_Excel_JSON_Data_Sources()
+			Dim federation As New FederationDataSource()
 
+			Dim sourceProducts As New Source("Products", CreateSqlDataSource(), "Products")
+			Dim sourceOrderDetail As New Source("OrderDetail", CreateExcelDataSource("SalesPerson.xlsx", "Data"))
+			Dim sourceHeader As New Source("OrderHeader", CreateExcelDataSource("OrderHeaders.xlsx", "OrderHeader"))
+			Dim sourceCustomer As New Source("Customer", CreateJsonDataSource("http://northwind.servicestack.net/customers.json"),"Customers")
+
+            Dim query As SelectNode = sourceHeader.From().
+                Select("OrderID", "Status", "Description").
+                Join(sourceOrderDetail, "[OrderHeader.OrderID] = [OrderDetail.OrderID]").
+                Select("ProductName", "Quantity", "Extended Price").
+                Join(sourceCustomer, "[OrderHeader.CustomerID] = [Customer.Id]").
+                Select("CompanyName", "ContactName", "City", "Country").
+                Join(sourceProducts, "[OrderDetail.ProductName]=[Products.ProductName]").
+                Select("QuantityPerUnit", "CategoryID").Build("OrderHeaderOrderCustomerProducts")
+
+            federation.Queries.Add(query)
+			federation.Fill()
+			Dim result = TryCast(DirectCast(federation, IListSource).GetList(), IResultSet)
+			DataSource = result(0)
+		End Sub
+
+		Private Shared Function CreateSqlDataSource() As SqlDataSource
+			Dim sqlDataSource = New SqlDataSource(New XmlFileConnectionParameters("Products.xml"))
+			sqlDataSource.Queries.Add(SelectQueryFluentBuilder.AddTable("Products").SelectColumns("ProductName", "QuantityPerUnit", "CategoryID", "UnitsInStock").Build("Products"))
+			Return sqlDataSource
+		End Function
 		Private Shared Function CreateExcelDataSource(ByVal fileName As String, ByVal worksheetName As String) As ExcelDataSource
             Dim excelDataSource = New ExcelDataSource With {
-                .FileName = fileName,
-                .SourceOptions = New ExcelSourceOptions With {
+                .FileName = fileName, .SourceOptions = New ExcelSourceOptions With {
                     .SkipEmptyRows = False,
                     .SkipHiddenColumns = False,
                     .SkipHiddenRows = False,
                     .ImportSettings = New ExcelWorksheetSettings With {.WorksheetName = worksheetName}
                 }
             }
-
             Return excelDataSource
+		End Function
+		Private Shared Function CreateJsonDataSource(ByVal urlString As String) As JsonDataSource
+			Dim jsonDataSource = New JsonDataSource()
+			jsonDataSource.JsonSource = New UriJsonSource(New Uri(urlString))
+			jsonDataSource.Fill()
+			Return jsonDataSource
 		End Function
 	End Class
 

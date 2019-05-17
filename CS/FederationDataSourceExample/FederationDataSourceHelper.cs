@@ -1,6 +1,7 @@
 ﻿using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.DataAccess.DataFederation;
 using DevExpress.DataAccess.Excel;
+using DevExpress.DataAccess.Json;
 using DevExpress.DataAccess.Sql;
 using DevExpress.DataAccess.Sql.DataApi;
 using System;
@@ -33,7 +34,7 @@ namespace FederationDataSourceExample
                 FilterString = "[Orders.CategoryName] = ?cat",
             };
             federation.Queries.Add(query);
-            federation.Fill(new[] { new QueryParameter("cat", typeof(string), "Seafood") });
+            federation.Fill(new[] { new DevExpress.DataAccess.Sql.QueryParameter("cat", typeof(string), "Seafood") });
             var result = ((IListSource)federation).GetList() as IResultSet;
             DataSource = result[0];
         }
@@ -42,10 +43,7 @@ namespace FederationDataSourceExample
         {
             FederationDataSource federation = new FederationDataSource();
 
-            var sqlDataSource = new SqlDataSource(new XmlFileConnectionParameters("Products.xml"));
-            sqlDataSource.Queries.Add(SelectQueryFluentBuilder.AddTable("Products").SelectColumns("ProductName", "QuantityPerUnit").Build("Products"));
-
-            Source sourceProducts = new Source("Products", sqlDataSource, "Products");
+            Source sourceProducts = new Source("Products", CreateSqlDataSource(), "Products");
             Source sourceOrderDetail = new Source("OrderDetail", CreateExcelDataSource("SalesPerson.xlsx", "Data"));
 
             var sourceNodeProducts = new SourceNode(sourceProducts, "Products");
@@ -75,14 +73,11 @@ namespace FederationDataSourceExample
             DataSource = result[0];
         }
 
-        static public void Two_Queries_Created_With_Fluent_API()
+        static public void Two_Queries_Created_With_Fluent_Interface()
         {
             FederationDataSource federation = new FederationDataSource();
 
-            var sqlDataSource = new SqlDataSource(new XmlFileConnectionParameters("Products.xml"));
-            sqlDataSource.Queries.Add(SelectQueryFluentBuilder.AddTable("Products").SelectColumns("ProductName", "QuantityPerUnit", "UnitsInStock").Build("Products"));
-
-            Source sourceProducts = new Source("Products", sqlDataSource, "Products");
+            Source sourceProducts = new Source("Products", CreateSqlDataSource(), "Products");
             Source sourceOrderDetail = new Source("OrderDetail", CreateExcelDataSource("SalesPerson.xlsx", "Data"));
             Source sourceHeader = new Source("OrderHeader", CreateExcelDataSource("OrderHeaders.xlsx", "OrderHeader"));
 
@@ -161,7 +156,36 @@ namespace FederationDataSourceExample
             DataSource = federation;
         }
 
+        static public void Integrate_SQL_Excel_JSON_Data_Sources()
+        {
+            FederationDataSource federation = new FederationDataSource();
 
+            Source sourceProducts = new Source("Products", CreateSqlDataSource(), "Products");
+            Source sourceOrderDetail = new Source("OrderDetail", CreateExcelDataSource("SalesPerson.xlsx", "Data"));
+            Source sourceHeader = new Source("OrderHeader", CreateExcelDataSource("OrderHeaders.xlsx", "OrderHeader"));
+            Source sourceCustomer = new Source("Customer", CreateJsonDataSource("http://northwind.servicestack.net/customers.json"),"Customers");
+
+            SelectNode query = sourceHeader.From().Select("OrderID","Status", "Description")
+                .Join(sourceOrderDetail, "[OrderHeader.OrderID] = [OrderDetail.OrderID]")
+                .Select("ProductName","Quantity", "Extended Price")
+                .Join(sourceCustomer, "[OrderHeader.CustomerID] = [Customer.Id]")
+                .Select("CompanyName", "ContactName", "City", "Country")
+                .Join(sourceProducts, "[OrderDetail.ProductName]=[Products.ProductName]")
+                .Select("QuantityPerUnit", "CategoryID")
+                .Build("OrderHeaderOrderCustomerProducts");
+
+            federation.Queries.Add(query);
+            federation.Fill();
+            var result = ((IListSource)federation).GetList() as IResultSet;
+            DataSource = result[0];
+        }
+
+        static SqlDataSource CreateSqlDataSource()
+        {
+            var sqlDataSource = new SqlDataSource(new XmlFileConnectionParameters("Products.xml"));
+            sqlDataSource.Queries.Add(SelectQueryFluentBuilder.AddTable("Products").SelectColumns("ProductName", "QuantityPerUnit", "CategoryID", "UnitsInStock").Build("Products"));
+            return sqlDataSource;
+        }
         static ExcelDataSource CreateExcelDataSource(string fileName, string worksheetName)
         {
             var excelDataSource = new ExcelDataSource
@@ -175,8 +199,14 @@ namespace FederationDataSourceExample
                     ImportSettings = new ExcelWorksheetSettings { WorksheetName = worksheetName }
                 }
             };
-
             return excelDataSource;
+        }
+        static  JsonDataSource CreateJsonDataSource(string urlString)
+        {
+            var jsonDataSource = new JsonDataSource();
+            jsonDataSource.JsonSource = new UriJsonSource(new Uri(urlString));
+            jsonDataSource.Fill();
+            return jsonDataSource;
         }
     }
 

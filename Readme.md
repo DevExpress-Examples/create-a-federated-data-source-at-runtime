@@ -10,3 +10,6 @@ The key part of this component is the [Queries](https://docs.devexpress.com/Core
 
 * [How to create Data Access Library data sources at runtime](https://isc.devexpress.com/Thread/WorkplaceDetails/T423404)
 * [Dashboards - Federated Data Source](https://docs.devexpress.com/Dashboard/400924)
+* [Reports - Data Federation](https://docs.devexpress.com/XtraReports/400917)
+* [How to Bind a Dashboard to a Federated Data Source Created at Runtime](https://github.com/DevExpress-Examples/winforms-dashboard-data-federation)
+* [ASP.NET MVC Dashboard - How to Bind a Dashboard to a Federated Data Source Created at Runtime](https://github.com/DevExpress-Examples/aspnet-mvc-dashboard-data-federation)
