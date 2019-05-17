@@ -1,3 +1,10 @@
+<!-- default file list -->
+*Files to look at*:
+
+* [Form1.cs](./CS/FederationDataSourceExample/Form1.cs) (VB: [Form1.vb](./VB/FederationDataSourceExample/Form1.vb))
+* [FederationDataSourceHelper.cs](.CS/FederationDataSourceExample/FederationDataSourceHelper.cs) (VB: [FederationDataSourceHelper.vb](.CS/FederationDataSourceExample/FederationDataSourceHelper.vb))
+<!-- default file list end -->
+
 # How to Create a Federated Data Source at Runtime
 
 A [FederationDataSource](https://docs.devexpress.com/CoreLibraries/DevExpress.DataAccess.DataFederation.FederationDataSource) is a data source component that integrates different data sources and provides uniform data access with a federated query.
