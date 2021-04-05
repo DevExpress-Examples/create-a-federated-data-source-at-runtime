@@ -2,7 +2,7 @@
 *Files to look at*:
 
 * [Form1.cs](./CS/FederationDataSourceExample/Form1.cs) (VB: [Form1.vb](./VB/FederationDataSourceExample/Form1.vb))
-* [FederationDataSourceHelper.cs](./CS/FederationDataSourceExample/FederationDataSourceHelper.cs) (VB: [FederationDataSourceHelper.vb](./CS/FederationDataSourceExample/FederationDataSourceHelper.vb))
+* [FederationDataSourceHelper.cs](./CS/FederationDataSourceExample/FederationDataSourceHelper.cs) (VB: [FederationDataSourceHelper.vb](./VB/FederationDataSourceExample/FederationDataSourceHelper.vb))
 <!-- default file list end -->
 
 # How to Create a Federated Data Source at Runtime
