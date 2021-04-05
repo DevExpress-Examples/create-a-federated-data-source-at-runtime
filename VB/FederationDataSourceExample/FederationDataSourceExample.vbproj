@@ -48,6 +48,9 @@
     <Reference Include="DevExpress.Data.v20.1">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="DevExpress.Data.Desktop.v20.1">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="DevExpress.DataAccess.v20.1">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
