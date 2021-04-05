@@ -1,4 +1,4 @@
-﻿using DevExpress.DataAccess.ConnectionParameters;
+using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.DataAccess.DataFederation;
 using DevExpress.DataAccess.Excel;
 using DevExpress.DataAccess.Sql;
