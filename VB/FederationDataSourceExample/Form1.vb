@@ -1,4 +1,4 @@
-﻿Imports DevExpress.DataAccess.ConnectionParameters
+Imports DevExpress.DataAccess.ConnectionParameters
 Imports DevExpress.DataAccess.DataFederation
 Imports DevExpress.DataAccess.Excel
 Imports DevExpress.DataAccess.Sql
