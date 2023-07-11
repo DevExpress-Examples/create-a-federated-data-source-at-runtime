@@ -1,4 +1,4 @@
-﻿Imports System.ComponentModel
+Imports System.ComponentModel
 Imports DevExpress.DataAccess.ConnectionParameters
 Imports DevExpress.DataAccess.DataFederation
 Imports DevExpress.DataAccess.Excel
