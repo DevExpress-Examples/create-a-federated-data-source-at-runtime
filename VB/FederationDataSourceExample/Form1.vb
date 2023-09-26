@@ -29,7 +29,7 @@ Namespace FederationDataSourceExample
 			gridView1.Columns.Clear()
 			gridControl1.DataSource = Nothing
 			Dim editor As ComboBoxEdit = TryCast(sender, ComboBoxEdit)
-			GetType(FederationDataSourceHelper).InvokeMember(editor.SelectedItem.ToString(), BindingFlags.InvokeMethod Or BindingFlags.Public Or BindingFlags.Static, Nothing, Nothing, New Object() { })
+			Call GetType(FederationDataSourceHelper).InvokeMember(editor.SelectedItem.ToString(), BindingFlags.InvokeMethod Or BindingFlags.Public Or BindingFlags.Static, Nothing, Nothing, New Object() { })
 			gridControl1.DataSource = FederationDataSourceHelper.DataSource
 			gridView1.EndUpdate()
 			gridView1.ExpandMasterRow(0)
