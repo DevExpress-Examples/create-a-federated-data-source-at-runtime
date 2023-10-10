@@ -3,7 +3,7 @@
 [![](https://img.shields.io/badge/Open_in_DevExpress_Support_Center-FF7200?style=flat-square&logo=DevExpress&logoColor=white)](https://supportcenter.devexpress.com/ticket/details/T828710)
 [![](https://img.shields.io/badge/📖_How_to_use_DevExpress_Examples-e9f6fc?style=flat-square)](https://docs.devexpress.com/GeneralInformation/403183)
 <!-- default badges end -->
-# Reporting for WinForms - Create a Federated Data Source at Runtime
+# How to Create a Federated Data Source at Runtime
 
 A [FederationDataSource](https://docs.devexpress.com/CoreLibraries/DevExpress.DataAccess.DataFederation.FederationDataSource) is a data source component that integrates different data sources and provides uniform data access with a federated query.
 
