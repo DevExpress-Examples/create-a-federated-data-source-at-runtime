@@ -33,7 +33,7 @@ The key part of this component is the [Queries](https://docs.devexpress.com/Core
 * [Dashboard for MVC - How to Register a Federated Data Source](https://github.com/DevExpress-Examples/aspnet-mvc-dashboard-data-federation)
 
 <!-- feedback -->
-## Does this example address your development requirements/objectives?
+## Does This Example Address Your Development Requirements/Objectives?
 
 [<img src="https://www.devexpress.com/support/examples/i/yes-button.svg"/>](https://www.devexpress.com/support/examples/survey.xml?utm_source=github&utm_campaign=create-a-federated-data-source-at-runtime&~~~was_helpful=yes) [<img src="https://www.devexpress.com/support/examples/i/no-button.svg"/>](https://www.devexpress.com/support/examples/survey.xml?utm_source=github&utm_campaign=create-a-federated-data-source-at-runtime&~~~was_helpful=no)
 
